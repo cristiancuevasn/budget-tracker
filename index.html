@@ -27,7 +27,7 @@
         
         /* Main App */
         .app { display: none; }
-        .header { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); padding: 20px; color: white; }
+        .header { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); padding: 20px 20px 30px 20px; color: white; margin-bottom: 10px; }
         .header-top { display: flex; justify-content: space-between; align-items: center; }
         .header h1 { font-size: 24px; }
         .user-info { display: flex; align-items: center; gap: 10px; }
@@ -71,7 +71,7 @@
         .transaction-amount.expense { color: var(--expense); }
         
         /* FAB */
-        .fab { position: fixed; bottom: 90px; right: 30px; width: 60px; height: 60px; background: var(--primary); border-radius: 50%; border: none; color: white; font-size: 30px; cursor: pointer; box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4); display: flex; align-items: center; justify-content: center; z-index: 40; }
+        .fab { position: fixed; bottom: 100px; right: 30px; width: 60px; height: 60px; background: var(--primary); border-radius: 50%; border: none; color: white; font-size: 30px; cursor: pointer; box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4); display: flex; align-items: center; justify-content: center; z-index: 40; }
         
         /* Modal */
         .modal { display: none; position: fixed; inset: 0; background: rgb(0 0 0 / 0.5); z-index: 100; align-items: center; justify-content: center; padding: 20px; }
@@ -130,8 +130,8 @@
         .toggle.active::after { transform: translateX(22px); }
         
         /* Navigation */
-        .nav { display: flex; background: var(--card); padding: 10px; position: fixed; bottom: 0; left: 0; right: 0; box-shadow: 0 -2px 10px rgb(0 0 0 / 0.05); }
-        .nav-item { flex: 1; text-align: center; padding: 10px; color: var(--text-light); font-size: 12px; cursor: pointer; }
+        .nav { display: flex; background: var(--card); padding: 12px 10px 20px 10px; position: fixed; bottom: 0; left: 0; right: 0; box-shadow: 0 -2px 10px rgb(0 0 0 / 0.05); z-index: 50; }
+        .nav-item { flex: 1; text-align: center; padding: 8px; color: var(--text-light); font-size: 12px; cursor: pointer; }
         .nav-item.active { color: var(--primary); }
         .nav-icon { font-size: 20px; display: block; margin-bottom: 4px; }
         
@@ -192,7 +192,7 @@
             .sidebar-item { padding: 12px 16px; border-radius: 10px; cursor: pointer; margin-bottom: 5px; color: var(--text-light); }
             .sidebar-item.active { background: var(--primary); color: white; }
             .nav { display: none; }
-            .fab { bottom: 90px; }
+            .fab { bottom: 110px; }
         }
     </style>
 </head>
@@ -229,85 +229,8 @@
 
         <div class="alert" id="budgetAlert"></div>
 
-        <!-- 50/30/20 Rule Section -->
-        <div style="padding: 0 20px 10px;">
-            <div class="chart-container" style="margin-bottom: 10px;">
-                <h3>📊 50/30/20 Rule</h3>
-                <div class="progress" style="height: 24px; border-radius: 12px; display: flex; overflow: hidden; margin-top: 10px;">
-                    <div id="needsBar" class="progress-fill" style="background: #ef4444; width: 0%; transition: width 0.3s;" title="Needs (50%)"></div>
-                    <div id="wantsBar" class="progress-fill" style="background: #f59e0b; width: 0%; transition: width 0.3s;" title="Wants (30%)"></div>
-                    <div id="savingsBar" class="progress-fill" style="background: #10b981; width: 0%; transition: width 0.3s;" title="Savings (20%)"></div>
-                </div>
-                <div style="display: flex; justify-content: space-between; margin-top: 8px; font-size: 11px;">
-                    <span style="color: #ef4444;">🟥 Needs 50%</span>
-                    <span style="color: #f59e0b;">🟧 Wants 30%</span>
-                    <span style="color: #10b981;">🟩 Savings 20%</span>
-                </div>
-                <div id="ruleStatus" style="margin-top: 10px; padding: 10px; border-radius: 8px; font-size: 13px; display: none;"></div>
-            </div>
-        </div>
-
-        <!-- Emergency Fund & Goals -->
-        <div style="padding: 0 20px 10px; display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
-            <div class="chart-container" style="margin: 0;">
-                <h3>🛡️ Emergency Fund</h3>
-                <div style="text-align: center; margin-top: 10px;">
-                    <div style="font-size: 20px; font-weight: 700; color: var(--text);" id="emergencyBalance">$0</div>
-                    <div style="font-size: 12px; color: var(--text-light);">of <span id="emergencyGoal">$3,000</span> goal</div>
-                    <div class="progress" style="margin-top: 8px;">
-                        <div id="emergencyProgress" class="progress-fill ok" style="width: 0%;"></div>
-                    </div>
-                </div>
-                <button onclick="openModal('emergencyModal')" style="width: 100%; margin-top: 10px; padding: 8px; background: var(--primary); color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 12px;">Update Goal</button>
-            </div>
-            <div class="chart-container" style="margin: 0;">
-                <h3>🎯 Savings Goals</h3>
-                <div id="goalsList" style="max-height: 80px; overflow-y: auto;"></div>
-                <button onclick="openModal('goalsModal')" style="width: 100%; margin-top: 10px; padding: 8px; background: var(--primary); color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 12px;">+ Add Goal</button>
-            </div>
-        </div>
-
-        <!-- Debt Tracker & Tools -->
-        <div style="padding: 0 20px 10px; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px;">
-            <div class="chart-container" style="margin: 0; cursor: pointer;" onclick="openModal('debtModal')">
-                <h3>💳 Debt Tracker</h3>
-                <div id="totalDebtDisplay" style="text-align: center; padding: 10px 0;">
-                    <div style="font-size: 18px; font-weight: 700; color: var(--expense);" id="totalDebt">$0</div>
-                    <div style="font-size: 11px; color: var(--text-light);">Total Debt</div>
-                    <div style="font-size: 10px; color: var(--primary); margin-top: 5px;">🎯 Snowball/Avalanche</div>
-                </div>
-            </div>
-            <div class="chart-container" style="margin: 0; cursor: pointer;" onclick="openModal('compoundModal')">
-                <h3>📈 Compound Interest</h3>
-                <div style="text-align: center; padding: 10px 0;">
-                    <div style="font-size: 16px;">🧮 Calculator</div>
-                    <div style="font-size: 11px; color: var(--text-light); margin-top: 5px;">See your money grow</div>
-                </div>
-            </div>
-            <div class="chart-container" style="margin: 0; cursor: pointer;" onclick="openModal('tipsModal')">
-                <h3>💡 Savings Tips</h3>
-                <div style="text-align: center; padding: 10px 0;">
-                    <div style="font-size: 16px;">🌟 Smart Tips</div>
-                    <div style="font-size: 11px; color: var(--text-light); margin-top: 5px;">+Save money daily</div>
-                </div>
-            </div>
-        </div>
-
-        <!-- New: Subscriptions, Net Worth, Bills Quick Access -->
-        <div style="padding: 0 20px 10px; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px;">
-            <div class="mini-stat" onclick="openModal('subscriptionModal')">
-                <div class="label">📺 Subscriptions</div>
-                <div class="value" id="totalSubscriptions">$0/mo</div>
-            </div>
-            <div class="chart-container" style="margin: 0; padding: 15px; cursor: pointer;" onclick="openModal('netWorthModal')">
-                <h3 style="font-size: 12px; margin: 0;">💎 Net Worth</h3>
-                <div style="font-size: 16px; font-weight: 700; color: var(--primary);" id="quickNetWorth">$0</div>
-            </div>
-            <div class="chart-container" style="margin: 0; padding: 15px; cursor: pointer;" onclick="switchView('bills')">
-                <h3 style="font-size: 12px; margin: 0;">📄 Upcoming Bills</h3>
-                <div style="font-size: 16px; font-weight: 700;" id="upcomingBillsCount">0 due</div>
-            </div>
-        </div>
+        <!-- SIMPLIFIED: Solo muestra acceso rápido a más features desde el botón "More" -->
+        <!-- Las secciones detalladas ahora están ocultas y accesibles desde el menú -->
 
         <div class="stats">
             <div class="stat-card income">
@@ -334,22 +257,25 @@
             <button class="tab" data-filter="expense">Expense</button>
         </div>
 
-        <!-- Dashboard always visible with transactions list below -->
-        <div class="dashboard-content" style="padding: 0 20px 100px;">
-            <div class="chart-container">
-                <h3>Expense by Category</h3>
-                <canvas id="pieChart"></canvas>
-            </div>
-            <div class="chart-container">
-                <h3>Income vs Expense (6 months)</h3>
-                <canvas id="barChart"></canvas>
-            </div>
-            
-            <h3 style="margin: 20px 0 10px; color: var(--text);">Recent Transactions</h3>
+        <!-- SIMPLIFIED Dashboard: Solo transacciones recientes + un chart pequeño -->
+        <div class="dashboard-content" style="padding: 0 20px 120px;">
+            <h3 style="margin: 10px 0 10px; color: var(--text);">Recent Transactions</h3>
             <div id="transactionsList"></div>
             <div class="empty" id="emptyTransactions" style="display: none;">
                 <div class="empty-icon">📝</div>
                 <p>No transactions yet</p>
+            </div>
+            
+            <!-- Charts hidden by default for cleaner look - can be shown from More menu -->
+            <div id="chartsSection" style="display: none;">
+                <div class="chart-container">
+                    <h3>Expense by Category</h3>
+                    <canvas id="pieChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <h3>Income vs Expense (6 months)</h3>
+                    <canvas id="barChart"></canvas>
+                </div>
             </div>
         </div>
 
@@ -760,19 +686,19 @@
             </div>
             
             <div style="display: flex; flex-direction: column; gap: 10px;">
+                <button onclick="showCharts(); closeModal('moreModal');" style="padding: 16px; background: var(--card); border: 1px solid #e2e8f0; border-radius: 12px; text-align: left; cursor: pointer; display: flex; align-items: center; gap: 12px;">
+                    <span style="font-size: 20px;">📊</span>
+                    <div>
+                        <div style="font-weight: 600;">Charts & Budget</div>
+                        <div style="font-size: 12px; color: var(--text-light);">View graphs & 50/30/20</div>
+                    </div>
+                </button>
+                
                 <button onclick="switchView('categories'); closeModal('moreModal');" style="padding: 16px; background: var(--card); border: 1px solid #e2e8f0; border-radius: 12px; text-align: left; cursor: pointer; display: flex; align-items: center; gap: 12px;">
                     <span style="font-size: 20px;">📁</span>
                     <div>
                         <div style="font-weight: 600;">Categories</div>
                         <div style="font-size: 12px; color: var(--text-light);">Manage expense categories</div>
-                    </div>
-                </button>
-                
-                <button onclick="switchView('reports'); closeModal('moreModal');" style="padding: 16px; background: var(--card); border: 1px solid #e2e8f0; border-radius: 12px; text-align: left; cursor: pointer; display: flex; align-items: center; gap: 12px;">
-                    <span style="font-size: 20px;">📈</span>
-                    <div>
-                        <div style="font-weight: 600;">Reports</div>
-                        <div style="font-size: 12px; color: var(--text-light);">View financial reports</div>
                     </div>
                 </button>
                 
@@ -1503,6 +1429,22 @@
                 renderTransactions();
             });
         });
+
+        // Show Charts function - displays expense charts and budget info
+        function showCharts() {
+            const chartSection = document.getElementById('chartsSection');
+            const dashContent = document.querySelector('.dashboard-content');
+            
+            if (chartSection.style.display === 'none' || !chartSection.style.display) {
+                chartSection.style.display = 'block';
+                // Render charts when shown
+                if (typeof renderCharts === 'function') {
+                    renderCharts();
+                }
+            } else {
+                chartSection.style.display = 'none';
+            }
+        }
 
         // View switching via bottom nav
         function switchView(viewName) {
