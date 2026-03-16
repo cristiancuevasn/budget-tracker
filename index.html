@@ -135,6 +135,57 @@
         .nav-item.active { color: var(--primary); }
         .nav-icon { font-size: 20px; display: block; margin-bottom: 4px; }
         
+        /* Subscription Cards */
+        .subscription-item { display: flex; align-items: center; justify-content: space-between; background: var(--card); padding: 16px; border-radius: 12px; margin-bottom: 10px; box-shadow: 0 1px 3px rgb(0 0 0 / 0.05); }
+        .subscription-info { display: flex; align-items: center; gap: 12px; }
+        .subscription-icon { width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; background: linear-gradient(135deg, #6366f1, #8b5cf6); }
+        .subscription-details h4 { font-size: 14px; font-weight: 600; margin: 0; }
+        .subscription-details p { font-size: 12px; color: var(--text-light); margin: 2px 0 0 0; }
+        .subscription-price { text-align: right; }
+        .subscription-price .price { font-size: 18px; font-weight: 700; color: var(--text); }
+        .subscription-price .date { font-size: 11px; color: var(--text-light); }
+        
+        /* Net Worth Card */
+        .net-worth-card { background: var(--card); padding: 20px; border-radius: 16px; margin-bottom: 15px; box-shadow: var(--shadow); }
+        .net-worth-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .net-worth-total { text-align: center; padding: 20px 0; }
+        .net-worth-total .label { font-size: 12px; color: var(--text-light); text-transform: uppercase; }
+        .net-worth-total .value { font-size: 32px; font-weight: 700; }
+        .net-worth-total .value.positive { color: var(--income); }
+        .net-worth-total .value.negative { color: var(--expense); }
+        .net-worth-breakdown { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px; padding-top: 15px; border-top: 1px solid #e2e8f0; }
+        .breakdown-item { text-align: center; }
+        .breakdown-item .label { font-size: 11px; color: var(--text-light); margin-bottom: 5px; }
+        .breakdown-item .value { font-size: 18px; font-weight: 700; }
+        .breakdown-item.assets .value { color: var(--income); }
+        .breakdown-item.liabilities .value { color: var(--expense); }
+        
+        /* Bill Reminders */
+        .bill-item { display: flex; align-items: center; justify-content: space-between; background: var(--card); padding: 14px; border-radius: 12px; margin-bottom: 10px; box-shadow: 0 1px 3px rgb(0 0 0 / 0.05); border-left: 4px solid var(--primary); }
+        .bill-item.urgent { border-left-color: var(--expense); background: #fef2f2; }
+        .bill-item.soon { border-left-color: var(--warning); background: #fffbeb; }
+        .bill-info { flex: 1; }
+        .bill-info h4 { font-size: 14px; font-weight: 600; margin: 0; }
+        .bill-info .due-date { font-size: 12px; color: var(--text-light); }
+        .bill-amount { font-weight: 700; color: var(--text); }
+        .bill-actions { display: flex; gap: 8px; margin-top: 8px; }
+        .bill-actions button { padding: 4px 10px; font-size: 11px; border-radius: 6px; border: none; cursor: pointer; }
+        .bill-actions .pay-btn { background: var(--primary); color: white; }
+        .bill-actions .delete-btn { background: #fee2e2; color: var(--expense); }
+        .bill-badge { font-size: 10px; padding: 2px 8px; border-radius: 10px; margin-left: 8px; }
+        .bill-badge.urgent { background: var(--expense); color: white; }
+        .bill-badge.soon { background: var(--warning); color: white; }
+        
+        /* Section header with add button */
+        .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .section-header h3 { font-size: 16px; color: var(--text); }
+        .section-header button { padding: 8px 16px; background: var(--primary); color: white; border: none; border-radius: 8px; font-size: 12px; cursor: pointer; }
+        
+        /* Mini stat for subscriptions */
+        .mini-stat { background: linear-gradient(135deg, #8b5cf6, #6366f1); padding: 15px; border-radius: 12px; color: white; cursor: pointer; }
+        .mini-stat .label { font-size: 11px; opacity: 0.9; }
+        .mini-stat .value { font-size: 20px; font-weight: 700; }
+        
         @media (min-width: 1024px) {
             .app-layout { display: grid; grid-template-columns: 250px 1fr; min-height: calc(100vh - 80px); }
             .sidebar { background: var(--card); padding: 20px; border-right: 1px solid #e2e8f0; }
@@ -242,6 +293,22 @@
             </div>
         </div>
 
+        <!-- New: Subscriptions, Net Worth, Bills Quick Access -->
+        <div style="padding: 0 20px 10px; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px;">
+            <div class="mini-stat" onclick="openModal('subscriptionModal')">
+                <div class="label">📺 Subscriptions</div>
+                <div class="value" id="totalSubscriptions">$0/mo</div>
+            </div>
+            <div class="chart-container" style="margin: 0; padding: 15px; cursor: pointer;" onclick="openModal('netWorthModal')">
+                <h3 style="font-size: 12px; margin: 0;">💎 Net Worth</h3>
+                <div style="font-size: 16px; font-weight: 700; color: var(--primary);" id="quickNetWorth">$0</div>
+            </div>
+            <div class="chart-container" style="margin: 0; padding: 15px; cursor: pointer;" onclick="switchView('bills')">
+                <h3 style="font-size: 12px; margin: 0;">📄 Upcoming Bills</h3>
+                <div style="font-size: 16px; font-weight: 700;" id="upcomingBillsCount">0 due</div>
+            </div>
+        </div>
+
         <div class="stats">
             <div class="stat-card income">
                 <div class="stat-label">Income</div>
@@ -331,6 +398,65 @@
             </div>
         </div>
 
+        <!-- New: Subscriptions Section -->
+        <div class="section" id="subscriptionsSection" style="padding-bottom: 100px;">
+            <div class="section-header">
+                <h3>📺 Your Subscriptions</h3>
+                <button onclick="openModal('subscriptionModal')">+ Add New</button>
+            </div>
+            <div class="stat-card" style="margin-bottom: 15px;">
+                <div class="stat-label">Monthly Total</div>
+                <div class="stat-value" id="subscriptionTotal">$0.00/mo</div>
+            </div>
+            <div id="subscriptionsList"></div>
+            <div class="empty" id="emptySubscriptions" style="display: none;">
+                <div class="empty-icon">📺</div>
+                <p>No subscriptions yet</p>
+                <button class="btn btn-primary" style="margin-top: 15px; max-width: 200px;" onclick="openModal('subscriptionModal')">+ Add Subscription</button>
+            </div>
+        </div>
+
+        <!-- New: Net Worth Section -->
+        <div class="section" id="networthSection" style="padding-bottom: 100px;">
+            <div class="section-header">
+                <h3>💎 Net Worth</h3>
+                <button onclick="openModal('netWorthModal')">Update</button>
+            </div>
+            <div class="net-worth-card">
+                <div class="net-worth-total">
+                    <div class="label">Your Net Worth</div>
+                    <div class="value" id="netWorthDisplay">$0</div>
+                </div>
+                <div class="net-worth-breakdown">
+                    <div class="breakdown-item assets">
+                        <div class="label">Total Assets</div>
+                        <div class="value" id="totalAssets">$0</div>
+                    </div>
+                    <div class="breakdown-item liabilities">
+                        <div class="label">Total Liabilities</div>
+                        <div class="value" id="totalLiabilities">$0</div>
+                    </div>
+                </div>
+            </div>
+            <div id="assetsBreakdown" style="margin-top: 15px;"></div>
+            <div id="liabilitiesBreakdown" style="margin-top: 15px;"></div>
+        </div>
+
+        <!-- New: Bills Section -->
+        <div class="section" id="billsSection" style="padding-bottom: 100px;">
+            <div class="section-header">
+                <h3>📄 Upcoming Bills</h3>
+                <button onclick="openModal('billModal')">+ Add Bill</button>
+            </div>
+            <div id="billsAlerts"></div>
+            <div id="billsList"></div>
+            <div class="empty" id="emptyBills" style="display: none;">
+                <div class="empty-icon">📄</div>
+                <p>No bill reminders yet</p>
+                <button class="btn btn-primary" style="margin-top: 15px; max-width: 200px;" onclick="openModal('billModal')">+ Add Bill Reminder</button>
+            </div>
+        </div>
+
         <button class="fab" onclick="openModal('transactionModal')">+</button>
         
         <!-- Bottom Navigation -->
@@ -339,17 +465,21 @@
                 <span class="nav-icon">📊</span>
                 Dashboard
             </div>
-            <div class="nav-item" data-view="categories" onclick="switchView('categories')">
-                <span class="nav-icon">📁</span>
-                Categories
+            <div class="nav-item" data-view="subscriptions" onclick="switchView('subscriptions')">
+                <span class="nav-icon">📺</span>
+                Subs
             </div>
-            <div class="nav-item" data-view="reports" onclick="switchView('reports')">
-                <span class="nav-icon">📈</span>
-                Reports
+            <div class="nav-item" data-view="networth" onclick="switchView('networth')">
+                <span class="nav-icon">💎</span>
+                Net Worth
             </div>
-            <div class="nav-item" data-view="settings" onclick="switchView('settings')">
-                <span class="nav-icon">⚙️</span>
-                Settings
+            <div class="nav-item" data-view="bills" onclick="switchView('bills')">
+                <span class="nav-icon">📄</span>
+                Bills
+            </div>
+            <div class="nav-item" data-view="more" onclick="openModal('moreModal')">
+                <span class="nav-icon">☰</span>
+                More
             </div>
         </div>
     </div>
@@ -618,6 +748,195 @@
             </div>
             
             <button class="btn btn-primary" style="margin-top: 15px; background: #f59e0b;" onclick="showRandomTip()">🎲 Show Another Tip</button>
+        </div>
+    </div>
+
+    <!-- More Options Modal -->
+    <div class="modal" id="moreModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">☰ More Options</h2>
+                <button class="modal-close" onclick="closeModal('moreModal')">&times;</button>
+            </div>
+            
+            <div style="display: flex; flex-direction: column; gap: 10px;">
+                <button onclick="switchView('categories'); closeModal('moreModal');" style="padding: 16px; background: var(--card); border: 1px solid #e2e8f0; border-radius: 12px; text-align: left; cursor: pointer; display: flex; align-items: center; gap: 12px;">
+                    <span style="font-size: 20px;">📁</span>
+                    <div>
+                        <div style="font-weight: 600;">Categories</div>
+                        <div style="font-size: 12px; color: var(--text-light);">Manage expense categories</div>
+                    </div>
+                </button>
+                
+                <button onclick="switchView('reports'); closeModal('moreModal');" style="padding: 16px; background: var(--card); border: 1px solid #e2e8f0; border-radius: 12px; text-align: left; cursor: pointer; display: flex; align-items: center; gap: 12px;">
+                    <span style="font-size: 20px;">📈</span>
+                    <div>
+                        <div style="font-weight: 600;">Reports</div>
+                        <div style="font-size: 12px; color: var(--text-light);">View financial reports</div>
+                    </div>
+                </button>
+                
+                <button onclick="openModal('debtModal'); closeModal('moreModal');" style="padding: 16px; background: var(--card); border: 1px solid #e2e8f0; border-radius: 12px; text-align: left; cursor: pointer; display: flex; align-items: center; gap: 12px;">
+                    <span style="font-size: 20px;">💳</span>
+                    <div>
+                        <div style="font-weight: 600;">Debt Tracker</div>
+                        <div style="font-size: 12px; color: var(--text-light);">Track and pay off debts</div>
+                    </div>
+                </button>
+                
+                <button onclick="openModal('emergencyModal'); closeModal('moreModal');" style="padding: 16px; background: var(--card); border: 1px solid #e2e8f0; border-radius: 12px; text-align: left; cursor: pointer; display: flex; align-items: center; gap: 12px;">
+                    <span style="font-size: 20px;">🛡️</span>
+                    <div>
+                        <div style="font-weight: 600;">Emergency Fund</div>
+                        <div style="font-size: 12px; color: var(--text-light);">Build your safety net</div>
+                    </div>
+                </button>
+                
+                <button onclick="openModal('goalsModal'); closeModal('moreModal');" style="padding: 16px; background: var(--card); border: 1px solid #e2e8f0; border-radius: 12px; text-align: left; cursor: pointer; display: flex; align-items: center; gap: 12px;">
+                    <span style="font-size: 20px;">🎯</span>
+                    <div>
+                        <div style="font-weight: 600;">Savings Goals</div>
+                        <div style="font-size: 12px; color: var(--text-light);">Track your goals</div>
+                    </div>
+                </button>
+                
+                <button onclick="switchView('settings'); closeModal('moreModal');" style="padding: 16px; background: var(--card); border: 1px solid #e2e8f0; border-radius: 12px; text-align: left; cursor: pointer; display: flex; align-items: center; gap: 12px;">
+                    <span style="font-size: 20px;">⚙️</span>
+                    <div>
+                        <div style="font-weight: 600;">Settings</div>
+                        <div style="font-size: 12px; color: var(--text-light);">App preferences</div>
+                    </div>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Subscription Modal -->
+    <div class="modal" id="subscriptionModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">📺 New Subscription</h2>
+                <button class="modal-close" onclick="closeModal('subscriptionModal')">&times;</button>
+            </div>
+            <form onsubmit="saveSubscription(event)">
+                <div class="form-group">
+                    <label class="form-label">Service Name</label>
+                    <input type="text" class="form-input" id="subName" required placeholder="e.g., Netflix, Spotify">
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Monthly Price</label>
+                        <input type="number" class="form-input" id="subPrice" step="0.01" required placeholder="9.99">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Billing Day</label>
+                        <select class="form-select" id="subDay">
+                            <option value="1">1st</option>
+                            <option value="5">5th</option>
+                            <option value="10">10th</option>
+                            <option value="15">15th</option>
+                            <option value="20">20th</option>
+                            <option value="25">25th</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Category</label>
+                    <select class="form-select" id="subCategory">
+                        <option value="streaming">📺 Streaming</option>
+                        <option value="music">🎵 Music</option>
+                        <option value="gym">🏋️ Gym/Fitness</option>
+                        <option value="cloud">☁️ Cloud Storage</option>
+                        <option value="gaming">🎮 Gaming</option>
+                        <option value="news">📰 News/Magazines</option>
+                        <option value="utilities">💡 Utilities</option>
+                        <option value="software">💻 Software</option>
+                        <option value="other">📦 Other</option>
+                    </select>
+                </div>
+                <input type="hidden" id="subId">
+                <div class="form-row">
+                    <button type="button" class="btn btn-danger" onclick="deleteSubscription()" id="deleteSubBtn" style="display: none;">Delete</button>
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Net Worth Modal -->
+    <div class="modal" id="netWorthModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">💎 Update Net Worth</h2>
+                <button class="modal-close" onclick="closeModal('netWorthModal')">&times;</button>
+            </div>
+            <form onsubmit="saveNetWorth(event)">
+                <div class="form-group">
+                    <label class="form-label">💰 Assets (What you own)</label>
+                    <div style="margin-top: 10px;">
+                        <input type="number" class="form-input" id="assetCash" step="0.01" placeholder="Cash/Savings" style="margin-bottom: 8px;">
+                        <input type="number" class="form-input" id="assetInvestments" step="0.01" placeholder="Investments (Stocks, 401k, etc)" style="margin-bottom: 8px;">
+                        <input type="number" class="form-input" id="assetProperty" step="0.01" placeholder="Property/Real Estate" style="margin-bottom: 8px;">
+                        <input type="number" class="form-input" id="assetVehicles" step="0.01" placeholder="Vehicles" style="margin-bottom: 8px;">
+                        <input type="number" class="form-input" id="assetOther" step="0.01" placeholder="Other Assets">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">💳 Liabilities (What you owe)</label>
+                    <div style="margin-top: 10px;">
+                        <input type="number" class="form-input" id="liabMortgage" step="0.01" placeholder="Mortgage" style="margin-bottom: 8px;">
+                        <input type="number" class="form-input" id="liabStudent" step="0.01" placeholder="Student Loans" style="margin-bottom: 8px;">
+                        <input type="number" class="form-input" id="liabCredit" step="0.01" placeholder="Credit Cards" style="margin-bottom: 8px;">
+                        <input type="number" class="form-input" id="liabCar" step="0.01" placeholder="Car Loan" style="margin-bottom: 8px;">
+                        <input type="number" class="form-input" id="liabOther" step="0.01" placeholder="Other Debts">
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary">Save Net Worth</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Bill Reminder Modal -->
+    <div class="modal" id="billModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">📅 New Bill Reminder</h2>
+                <button class="modal-close" onclick="closeModal('billModal')">&times;</button>
+            </div>
+            <form onsubmit="saveBill(event)">
+                <div class="form-group">
+                    <label class="form-label">Bill Name</label>
+                    <input type="text" class="form-input" id="billName" required placeholder="e.g., Electric Bill, Internet">
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Amount</label>
+                        <input type="number" class="form-input" id="billAmount" step="0.01" required placeholder="0.00">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Due Date</label>
+                        <input type="date" class="form-input" id="billDueDate" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Category</label>
+                    <select class="form-select" id="billCategory">
+                        <option value="utilities">💡 Utilities</option>
+                        <option value="rent">🏠 Rent/Mortgage</option>
+                        <option value="insurance">🛡️ Insurance</option>
+                        <option value="internet">🌐 Internet</option>
+                        <option value="phone">📱 Phone</option>
+                        <option value="streaming">📺 Streaming</option>
+                        <option value="loan">💳 Loan</option>
+                        <option value="other">📦 Other</option>
+                    </select>
+                </div>
+                <input type="hidden" id="billId">
+                <div class="form-row">
+                    <button type="button" class="btn btn-danger" onclick="deleteBill()" id="deleteBillBtn" style="display: none;">Delete</button>
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </div>
+            </form>
         </div>
     </div>
 
@@ -1653,6 +1972,463 @@
         }
 
         enhanceGoalsWithSMART();
+
+        // ===== SUBSCRIPTIONS FEATURE =====
+        let subscriptions = JSON.parse(localStorage.getItem('budget-subscriptions') || '[]');
+
+        const subscriptionIcons = {
+            streaming: '📺',
+            music: '🎵',
+            gym: '🏋️',
+            cloud: '☁️',
+            gaming: '🎮',
+            news: '📰',
+            utilities: '💡',
+            software: '💻',
+            other: '📦'
+        };
+
+        function renderSubscriptions() {
+            const container = document.getElementById('subscriptionsList');
+            const totalEl = document.getElementById('subscriptionTotal');
+            const quickTotalEl = document.getElementById('totalSubscriptions');
+            const emptyEl = document.getElementById('emptySubscriptions');
+            
+            if (subscriptions.length === 0) {
+                container.innerHTML = '';
+                emptyEl.style.display = 'block';
+                totalEl.textContent = '$0/mo';
+                quickTotalEl.textContent = '$0/mo';
+                return;
+            }
+            
+            emptyEl.style.display = 'none';
+            
+            const total = subscriptions.reduce((sum, s) => sum + s.price, 0);
+            const sym = currencySymbols[settings.currency];
+            totalEl.textContent = sym + total.toFixed(2) + '/mo';
+            quickTotalEl.textContent = sym + total.toFixed(2) + '/mo';
+            
+            container.innerHTML = subscriptions.map(s => {
+                const icon = subscriptionIcons[s.category] || '📦';
+                return `
+                    <div class="subscription-item" onclick="editSubscription('${s.id}')">
+                        <div class="subscription-info">
+                            <div class="subscription-icon">${icon}</div>
+                            <div class="subscription-details">
+                                <h4>${s.name}</h4>
+                                <p>Billing day: ${s.day}${getOrdinalSuffix(s.day)}</p>
+                            </div>
+                        </div>
+                        <div class="subscription-price">
+                            <div class="price">${sym}${s.price.toFixed(2)}</div>
+                            <div class="date">/month</div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function getOrdinalSuffix(day) {
+            if (day > 3 && day < 21) return 'th';
+            switch (day % 10) {
+                case 1: return 'st';
+                case 2: return 'nd';
+                case 3: return 'rd';
+                default: return 'th';
+            }
+        }
+
+        function editSubscription(id) {
+            const sub = subscriptions.find(s => s.id === id);
+            if (!sub) return;
+            
+            document.getElementById('subName').value = sub.name;
+            document.getElementById('subPrice').value = sub.price;
+            document.getElementById('subDay').value = sub.day;
+            document.getElementById('subCategory').value = sub.category;
+            document.getElementById('subId').value = sub.id;
+            document.getElementById('deleteSubBtn').style.display = 'block';
+            openModal('subscriptionModal');
+        }
+
+        function saveSubscription(e) {
+            e.preventDefault();
+            const id = document.getElementById('subId').value;
+            const sub = {
+                id: id || 'sub' + Date.now(),
+                name: document.getElementById('subName').value,
+                price: parseFloat(document.getElementById('subPrice').value),
+                day: parseInt(document.getElementById('subDay').value),
+                category: document.getElementById('subCategory').value
+            };
+            
+            if (id) {
+                const index = subscriptions.findIndex(s => s.id === id);
+                if (index >= 0) subscriptions[index] = sub;
+            } else {
+                subscriptions.push(sub);
+            }
+            
+            localStorage.setItem('budget-subscriptions', JSON.stringify(subscriptions));
+            renderSubscriptions();
+            closeModal('subscriptionModal');
+            resetSubscriptionForm();
+        }
+
+        function deleteSubscription() {
+            const id = document.getElementById('subId').value;
+            if (confirm('Delete this subscription?')) {
+                subscriptions = subscriptions.filter(s => s.id !== id);
+                localStorage.setItem('budget-subscriptions', JSON.stringify(subscriptions));
+                renderSubscriptions();
+                closeModal('subscriptionModal');
+                resetSubscriptionForm();
+            }
+        }
+
+        function resetSubscriptionForm() {
+            document.getElementById('subId').value = '';
+            document.getElementById('subName').value = '';
+            document.getElementById('subPrice').value = '';
+            document.getElementById('subDay').value = '1';
+            document.getElementById('subCategory').value = 'streaming';
+            document.getElementById('deleteSubBtn').style.display = 'none';
+        }
+
+        // ===== NET WORTH FEATURE =====
+        let netWorthData = JSON.parse(localStorage.getItem('budget-networth') || '{"assets": {"cash": 0, "investments": 0, "property": 0, "vehicles": 0, "other": 0}, "liabilities": {"mortgage": 0, "student": 0, "credit": 0, "car": 0, "other": 0}}');
+
+        function renderNetWorth() {
+            const sym = currencySymbols[settings.currency];
+            
+            const totalAssets = Object.values(netWorthData.assets).reduce((a, b) => a + b, 0);
+            const totalLiabilities = Object.values(netWorthData.liabilities).reduce((a, b) => a + b, 0);
+            const netWorth = totalAssets - totalLiabilities;
+            
+            // Update display
+            document.getElementById('netWorthDisplay').textContent = sym + netWorth.toLocaleString('en-US', {minimumFractionDigits: 2});
+            document.getElementById('netWorthDisplay').className = 'value ' + (netWorth >= 0 ? 'positive' : 'negative');
+            
+            document.getElementById('totalAssets').textContent = sym + totalAssets.toLocaleString('en-US', {minimumFractionDigits: 2});
+            document.getElementById('totalLiabilities').textContent = sym + totalLiabilities.toLocaleString('en-US', {minimumFractionDigits: 2});
+            document.getElementById('quickNetWorth').textContent = sym + netWorth.toLocaleString('en-US', {minimumFractionDigits: 0});
+            
+            // Breakdown
+            const assetsContainer = document.getElementById('assetsBreakdown');
+            const liabContainer = document.getElementById('liabilitiesBreakdown');
+            
+            const assetLabels = { cash: '💵 Cash/Savings', investments: '📈 Investments', property: '🏠 Property', vehicles: '🚗 Vehicles', other: '📦 Other' };
+            const liabLabels = { mortgage: '🏠 Mortgage', student: '🎓 Student Loans', credit: '💳 Credit Cards', car: '🚗 Car Loan', other: '📦 Other' };
+            
+            assetsContainer.innerHTML = '<h4 style="font-size: 14px; margin-bottom: 10px;">Assets</h4>' + 
+                Object.entries(netWorthData.assets).map(([key, val]) => 
+                    `<div style="display: flex; justify-content: space-between; padding: 8px; background: var(--bg); border-radius: 8px; margin-bottom: 5px; font-size: 13px;">
+                        <span>${assetLabels[key] || key}</span>
+                        <span style="color: var(--income); font-weight: 600;">${sym}${val.toLocaleString('en-US', {minimumFractionDigits: 2})}</span>
+                    </div>`
+                ).join('');
+                
+            liabContainer.innerHTML = '<h4 style="font-size: 14px; margin-bottom: 10px;">Liabilities</h4>' + 
+                Object.entries(netWorthData.liabilities).map(([key, val]) => 
+                    `<div style="display: flex; justify-content: space-between; padding: 8px; background: var(--bg); border-radius: 8px; margin-bottom: 5px; font-size: 13px;">
+                        <span>${liabLabels[key] || key}</span>
+                        <span style="color: var(--expense); font-weight: 600;">${sym}${val.toLocaleString('en-US', {minimumFractionDigits: 2})}</span>
+                    </div>`
+                ).join('');
+        }
+
+        function saveNetWorth(e) {
+            e.preventDefault();
+            netWorthData.assets.cash = parseFloat(document.getElementById('assetCash').value) || 0;
+            netWorthData.assets.investments = parseFloat(document.getElementById('assetInvestments').value) || 0;
+            netWorthData.assets.property = parseFloat(document.getElementById('assetProperty').value) || 0;
+            netWorthData.assets.vehicles = parseFloat(document.getElementById('assetVehicles').value) || 0;
+            netWorthData.assets.other = parseFloat(document.getElementById('assetOther').value) || 0;
+            
+            netWorthData.liabilities.mortgage = parseFloat(document.getElementById('liabMortgage').value) || 0;
+            netWorthData.liabilities.student = parseFloat(document.getElementById('liabStudent').value) || 0;
+            netWorthData.liabilities.credit = parseFloat(document.getElementById('liabCredit').value) || 0;
+            netWorthData.liabilities.car = parseFloat(document.getElementById('liabCar').value) || 0;
+            netWorthData.liabilities.other = parseFloat(document.getElementById('liabOther').value) || 0;
+            
+            localStorage.setItem('budget-networth', JSON.stringify(netWorthData));
+            renderNetWorth();
+            closeModal('netWorthModal');
+        }
+
+        // ===== BILL REMINDERS FEATURE =====
+        let bills = JSON.parse(localStorage.getItem('budget-bills') || '[]');
+
+        const billCategoryIcons = {
+            utilities: '💡',
+            rent: '🏠',
+            insurance: '🛡️',
+            internet: '🌐',
+            phone: '📱',
+            streaming: '📺',
+            loan: '💳',
+            other: '📦'
+        };
+
+        function renderBills() {
+            const container = document.getElementById('billsList');
+            const alertsContainer = document.getElementById('billsAlerts');
+            const emptyEl = document.getElementById('emptyBills');
+            const upcomingCountEl = document.getElementById('upcomingBillsCount');
+            
+            if (bills.length === 0) {
+                container.innerHTML = '';
+                alertsContainer.innerHTML = '';
+                emptyEl.style.display = 'block';
+                upcomingCountEl.textContent = '0 due';
+                return;
+            }
+            
+            emptyEl.style.display = 'none';
+            
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            
+            // Sort by due date
+            const sortedBills = [...bills].sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate));
+            
+            // Count upcoming (within 7 days)
+            const upcomingBills = sortedBills.filter(b => {
+                const dueDate = new Date(b.dueDate);
+                dueDate.setHours(0, 0, 0, 0);
+                const daysUntil = Math.ceil((dueDate - today) / (1000 * 60 * 60 * 24));
+                return daysUntil >= 0 && daysUntil <= 7;
+            });
+            
+            upcomingCountEl.textContent = upcomingBills.length + ' due';
+            
+            // Render alerts
+            const urgentBills = sortedBills.filter(b => {
+                const dueDate = new Date(b.dueDate);
+                dueDate.setHours(0, 0, 0, 0);
+                const daysUntil = Math.ceil((dueDate - today) / (1000 * 60 * 60 * 24));
+                return daysUntil < 0 || (daysUntil >= 0 && daysUntil <= 3);
+            });
+            
+            const soonBills = sortedBills.filter(b => {
+                const dueDate = new Date(b.dueDate);
+                dueDate.setHours(0, 0, 0, 0);
+                const daysUntil = Math.ceil((dueDate - today) / (1000 * 60 * 60 * 24));
+                return daysUntil > 3 && daysUntil <= 7;
+            });
+            
+            let alertsHtml = '';
+            if (urgentBills.length > 0) {
+                alertsHtml += `<div style="padding: 12px; background: #fee2e2; color: #991b1b; border-radius: 10px; margin-bottom: 10px; font-size: 13px;">
+                    ⚠️ <strong>${urgentBills.length} bill${urgentBills.length > 1 ? 's' : ''} due NOW or OVERDUE!</strong>
+                </div>`;
+            }
+            if (soonBills.length > 0) {
+                alertsHtml += `<div style="padding: 12px; background: #fef3c7; color: #92400e; border-radius: 10px; margin-bottom: 10px; font-size: 13px;">
+                    ⏰ <strong>${soonBills.length} bill${soonBills.length > 1 ? 's' : ''} due soon</strong> (within 7 days)
+                </div>`;
+            }
+            alertsContainer.innerHTML = alertsHtml;
+            
+            const sym = currencySymbols[settings.currency];
+            
+            container.innerHTML = sortedBills.map(b => {
+                const dueDate = new Date(b.dueDate);
+                dueDate.setHours(0, 0, 0, 0);
+                const daysUntil = Math.ceil((dueDate - today) / (1000 * 60 * 60 * 24));
+                const icon = billCategoryIcons[b.category] || '📦';
+                
+                let urgencyClass = '';
+                let badge = '';
+                if (daysUntil < 0) {
+                    urgencyClass = 'urgent';
+                    badge = '<span class="bill-badge urgent">OVERDUE</span>';
+                } else if (daysUntil <= 3) {
+                    urgencyClass = 'urgent';
+                    badge = '<span class="bill-badge urgent">URGENT</span>';
+                } else if (daysUntil <= 7) {
+                    urgencyClass = 'soon';
+                    badge = '<span class="bill-badge soon">SOON</span>';
+                }
+                
+                const dueDateStr = dueDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+                const dueText = daysUntil < 0 ? `Overdue by ${Math.abs(daysUntil)} days` : 
+                               daysUntil === 0 ? 'Due Today' : 
+                               daysUntil === 1 ? 'Due Tomorrow' : 
+                               `Due in ${daysUntil} days`;
+                
+                return `
+                    <div class="bill-item ${urgencyClass}">
+                        <div class="bill-info">
+                            <h4>${icon} ${b.name} ${badge}</h4>
+                            <div class="due-date">${dueText} (${dueDateStr})</div>
+                        </div>
+                        <div style="text-align: right;">
+                            <div class="bill-amount">${sym}${b.amount.toFixed(2)}</div>
+                            <div class="bill-actions">
+                                <button class="pay-btn" onclick="markBillPaid('${b.id}')">✓ Paid</button>
+                                <button class="delete-btn" onclick="deleteBillById('${b.id}')">✕</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function editBill(id) {
+            const bill = bills.find(b => b.id === id);
+            if (!bill) return;
+            
+            document.getElementById('billName').value = bill.name;
+            document.getElementById('billAmount').value = bill.amount;
+            document.getElementById('billDueDate').value = bill.dueDate;
+            document.getElementById('billCategory').value = bill.category;
+            document.getElementById('billId').value = bill.id;
+            document.getElementById('deleteBillBtn').style.display = 'block';
+            openModal('billModal');
+        }
+
+        function saveBill(e) {
+            e.preventDefault();
+            const id = document.getElementById('billId').value;
+            const bill = {
+                id: id || 'bill' + Date.now(),
+                name: document.getElementById('billName').value,
+                amount: parseFloat(document.getElementById('billAmount').value),
+                dueDate: document.getElementById('billDueDate').value,
+                category: document.getElementById('billCategory').value
+            };
+            
+            if (id) {
+                const index = bills.findIndex(b => b.id === id);
+                if (index >= 0) bills[index] = bill;
+            } else {
+                bills.push(bill);
+            }
+            
+            localStorage.setItem('budget-bills', JSON.stringify(bills));
+            renderBills();
+            closeModal('billModal');
+            resetBillForm();
+        }
+
+        function deleteBill() {
+            const id = document.getElementById('billId').value;
+            deleteBillById(id);
+            closeModal('billModal');
+            resetBillForm();
+        }
+
+        function deleteBillById(id) {
+            if (confirm('Delete this bill reminder?')) {
+                bills = bills.filter(b => b.id !== id);
+                localStorage.setItem('budget-bills', JSON.stringify(bills));
+                renderBills();
+            }
+        }
+
+        function markBillPaid(id) {
+            const bill = bills.find(b => b.id === id);
+            if (!bill) return;
+            
+            // Move to next month
+            const currentDue = new Date(bill.dueDate);
+            currentDue.setMonth(currentDue.getMonth() + 1);
+            bill.dueDate = currentDue.toISOString().split('T')[0];
+            
+            localStorage.setItem('budget-bills', JSON.stringify(bills));
+            renderBills();
+            alert(`✅ Marked as paid! Next due: ${bill.dueDate}`);
+        }
+
+        function resetBillForm() {
+            document.getElementById('billId').value = '';
+            document.getElementById('billName').value = '';
+            document.getElementById('billAmount').value = '';
+            document.getElementById('billDueDate').value = '';
+            document.getElementById('billCategory').value = 'utilities';
+            document.getElementById('deleteBillBtn').style.display = 'none';
+        }
+
+        // Initialize new features
+        function initNewFeatures() {
+            renderSubscriptions();
+            renderNetWorth();
+            renderBills();
+            
+            // Set default bill date to today
+            document.getElementById('billDueDate').value = new Date().toISOString().split('T')[0];
+        }
+
+        // Override switchView to handle new views
+        const originalSwitchView = switchView;
+        switchView = function(viewName) {
+            const sectionMap = {
+                'dashboard': document.querySelector('.dashboard-content'),
+                'categories': document.getElementById('categoriesSection'),
+                'reports': document.getElementById('reportsSection'),
+                'settings': document.getElementById('settingsSection'),
+                'subscriptions': document.getElementById('subscriptionsSection'),
+                'networth': document.getElementById('networthSection'),
+                'bills': document.getElementById('billsSection')
+            };
+            
+            // Hide all sections first
+            Object.values(sectionMap).forEach(el => {
+                if(el) el.style.display = 'none';
+            });
+            
+            // Show selected section
+            if (sectionMap[viewName]) {
+                sectionMap[viewName].style.display = 'block';
+            }
+            
+            // Update nav - excluding 'more' which is handled by modal
+            if (viewName !== 'more' && viewName !== 'dashboard') {
+                document.querySelectorAll('.nav-item').forEach(item => {
+                    item.classList.toggle('active', item.dataset.view === viewName);
+                });
+            }
+            
+            // Special rendering for reports
+            if (viewName === 'reports') {
+                renderMonthlySummary();
+            }
+            
+            // Show dashboard content for dashboard
+            if (viewName === 'dashboard' && document.querySelector('.dashboard-content')) {
+                document.querySelector('.dashboard-content').style.display = 'block';
+            }
+            
+            currentSection = viewName;
+        };
+
+        // Initialize on load (after user login)
+        if (localStorage.getItem('budget-loggedIn')) {
+            setTimeout(() => {
+                calculate503020();
+                renderEmergencyFund();
+                renderGoals();
+                renderDebtList();
+                renderSavingsTips();
+                initNewFeatures();
+            }, 500);
+        }
+
+        // Also call initNewFeatures when user loads
+        const originalCheckAuth = checkAuth;
+        checkAuth = function() {
+            const savedUser = localStorage.getItem('budget_user');
+            if (savedUser) {
+                user = JSON.parse(savedUser);
+                loadData();
+                showApp();
+                setTimeout(initNewFeatures, 500);
+            } else {
+                document.getElementById('authScreen').style.display = 'flex';
+            }
+        };
     </script>
 </body>
 </html>>l>>html>>
