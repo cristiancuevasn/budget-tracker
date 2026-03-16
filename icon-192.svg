@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192">
+  <rect width="192" height="192" rx="40" fill="#6366f1"/>
+  <circle cx="96" cy="96" r="50" fill="white" opacity="0.2"/>
+  <text x="96" y="115" text-anchor="middle" font-size="60" fill="white">💰</text>
+  <path d="M60 140 L132 140" stroke="white" stroke-width="8" stroke-linecap="round"/>
+  <circle cx="75" cy="135" r="6" fill="#10b981"/>
+  <circle cx="96" cy="135" r="6" fill="#f59e0b"/>
+  <circle cx="117" cy="135" r="6" fill="#ef4444"/>
+</svg>
