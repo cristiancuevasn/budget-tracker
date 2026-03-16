@@ -178,6 +178,70 @@
 
         <div class="alert" id="budgetAlert"></div>
 
+        <!-- 50/30/20 Rule Section -->
+        <div style="padding: 0 20px 10px;">
+            <div class="chart-container" style="margin-bottom: 10px;">
+                <h3>📊 50/30/20 Rule</h3>
+                <div class="progress" style="height: 24px; border-radius: 12px; display: flex; overflow: hidden; margin-top: 10px;">
+                    <div id="needsBar" class="progress-fill" style="background: #ef4444; width: 0%; transition: width 0.3s;" title="Needs (50%)"></div>
+                    <div id="wantsBar" class="progress-fill" style="background: #f59e0b; width: 0%; transition: width 0.3s;" title="Wants (30%)"></div>
+                    <div id="savingsBar" class="progress-fill" style="background: #10b981; width: 0%; transition: width 0.3s;" title="Savings (20%)"></div>
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-top: 8px; font-size: 11px;">
+                    <span style="color: #ef4444;">🟥 Needs 50%</span>
+                    <span style="color: #f59e0b;">🟧 Wants 30%</span>
+                    <span style="color: #10b981;">🟩 Savings 20%</span>
+                </div>
+                <div id="ruleStatus" style="margin-top: 10px; padding: 10px; border-radius: 8px; font-size: 13px; display: none;"></div>
+            </div>
+        </div>
+
+        <!-- Emergency Fund & Goals -->
+        <div style="padding: 0 20px 10px; display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+            <div class="chart-container" style="margin: 0;">
+                <h3>🛡️ Emergency Fund</h3>
+                <div style="text-align: center; margin-top: 10px;">
+                    <div style="font-size: 20px; font-weight: 700; color: var(--text);" id="emergencyBalance">$0</div>
+                    <div style="font-size: 12px; color: var(--text-light);">of <span id="emergencyGoal">$3,000</span> goal</div>
+                    <div class="progress" style="margin-top: 8px;">
+                        <div id="emergencyProgress" class="progress-fill ok" style="width: 0%;"></div>
+                    </div>
+                </div>
+                <button onclick="openModal('emergencyModal')" style="width: 100%; margin-top: 10px; padding: 8px; background: var(--primary); color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 12px;">Update Goal</button>
+            </div>
+            <div class="chart-container" style="margin: 0;">
+                <h3>🎯 Savings Goals</h3>
+                <div id="goalsList" style="max-height: 80px; overflow-y: auto;"></div>
+                <button onclick="openModal('goalsModal')" style="width: 100%; margin-top: 10px; padding: 8px; background: var(--primary); color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 12px;">+ Add Goal</button>
+            </div>
+        </div>
+
+        <!-- Debt Tracker & Tools -->
+        <div style="padding: 0 20px 10px; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px;">
+            <div class="chart-container" style="margin: 0; cursor: pointer;" onclick="openModal('debtModal')">
+                <h3>💳 Debt Tracker</h3>
+                <div id="totalDebtDisplay" style="text-align: center; padding: 10px 0;">
+                    <div style="font-size: 18px; font-weight: 700; color: var(--expense);" id="totalDebt">$0</div>
+                    <div style="font-size: 11px; color: var(--text-light);">Total Debt</div>
+                    <div style="font-size: 10px; color: var(--primary); margin-top: 5px;">🎯 Snowball/Avalanche</div>
+                </div>
+            </div>
+            <div class="chart-container" style="margin: 0; cursor: pointer;" onclick="openModal('compoundModal')">
+                <h3>📈 Compound Interest</h3>
+                <div style="text-align: center; padding: 10px 0;">
+                    <div style="font-size: 16px;">🧮 Calculator</div>
+                    <div style="font-size: 11px; color: var(--text-light); margin-top: 5px;">See your money grow</div>
+                </div>
+            </div>
+            <div class="chart-container" style="margin: 0; cursor: pointer;" onclick="openModal('tipsModal')">
+                <h3>💡 Savings Tips</h3>
+                <div style="text-align: center; padding: 10px 0;">
+                    <div style="font-size: 16px;">🌟 Smart Tips</div>
+                    <div style="font-size: 11px; color: var(--text-light); margin-top: 5px;">+Save money daily</div>
+                </div>
+            </div>
+        </div>
+
         <div class="stats">
             <div class="stat-card income">
                 <div class="stat-label">Income</div>
@@ -326,6 +390,14 @@
                     </div>
                 </div>
                 <div class="form-group">
+                    <label class="form-label">💡 Need or Want?</label>
+                    <select class="form-select" id="transNeedWant" onchange="updateCategoryOptions()">
+                        <option value="need">🟥 Need (Essential)</option>
+                        <option value="want">🟧 Want (Non-Essential)</option>
+                        <option value="savings">🟩 Savings</option>
+                    </select>
+                </div>
+                <div class="form-group">
                     <label class="form-label">Payment Method</label>
                     <select class="form-select" id="transMethod">
                         <option value="card">💳 Card</option>
@@ -371,6 +443,181 @@
                 </div>
                 <button type="submit" class="btn btn-primary">Save Category</button>
             </form>
+        </div>
+    </div>
+
+    <!-- Emergency Fund Modal -->
+    <div class="modal" id="emergencyModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">🛡️ Emergency Fund Goal</h2>
+                <button class="modal-close" onclick="closeModal('emergencyModal')">&times;</button>
+            </div>
+            <form onsubmit="saveEmergencyGoal(event)">
+                <div class="form-group">
+                    <label class="form-label">Your monthly essential expenses:</label>
+                    <input type="number" class="form-input" id="monthlyExpenses" step="0.01" placeholder="e.g., 500">
+                </div>
+                <p style="font-size: 12px; color: var(--text-light); margin-bottom: 15px;">
+                    Recommended: 3-6 months of expenses. E.g., $500/mo × 3 = $1,500 goal
+                </p>
+                <div class="form-group">
+                    <label class="form-label">Add to emergency fund:</label>
+                    <input type="number" class="form-input" id="addToEmergency" step="0.01" placeholder="0.00">
+                </div>
+                <button type="submit" class="btn btn-primary">Save</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Goals Modal -->
+    <div class="modal" id="goalsModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">🎯 New Savings Goal</h2>
+                <button class="modal-close" onclick="closeModal('goalsModal')">&times;</button>
+            </div>
+            <form onsubmit="saveGoal(event)">
+                <div class="form-group">
+                    <label class="form-label">Goal Name</label>
+                    <input type="text" class="form-input" id="goalName" required placeholder="e.g., New Car">
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Target Amount</label>
+                        <input type="number" class="form-input" id="goalAmount" step="0.01" required placeholder="1000">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Target Date</label>
+                        <input type="date" class="form-input" id="goalDate" required>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary">Create Goal</button>
+            </form>
+            <div style="margin-top: 20px;">
+                <h4 style="font-size: 14px; margin-bottom: 10px;">Your Goals:</h4>
+                <div id="goalsListModal"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Debt Tracker Modal -->
+    <div class="modal" id="debtModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">💳 Debt Tracker</h2>
+                <button class="modal-close" onclick="closeModal('debtModal')">&times;</button>
+            </div>
+            
+            <div style="margin-bottom: 15px;">
+                <label class="form-label">Strategy:</label>
+                <select class="form-select" id="debtStrategy" onchange="renderDebtList()">
+                    <option value="snowball">🥇 Snowball (Smallest balance first)</option>
+                    <option value="avalanche">📊 Avalanche (Highest interest first)</option>
+                </select>
+            </div>
+            
+            <form onsubmit="addDebt(event)" style="margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid #eee;">
+                <div class="form-group">
+                    <label class="form-label">Debt Name</label>
+                    <input type="text" class="form-input" id="debtName" required placeholder="e.g., Credit Card">
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Balance</label>
+                        <input type="number" class="form-input" id="debtBalance" step="0.01" required placeholder="1000">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Interest Rate %</label>
+                        <input type="number" class="form-input" id="debtRate" step="0.01" required placeholder="18.99">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Minimum Payment</label>
+                    <input type="number" class="form-input" id="debtMinPayment" step="0.01" required placeholder="25">
+                </div>
+                <button type="submit" class="btn btn-primary">+ Add Debt</button>
+            </form>
+            
+            <div id="debtList" style="max-height: 200px; overflow-y: auto;"></div>
+            
+            <div id="debtPayoffPlan" style="margin-top: 20px; padding: 15px; background: var(--bg); border-radius: 10px; display: none;">
+                <h4 style="font-size: 14px; margin-bottom: 10px;">🎯 Payoff Strategy</h4>
+                <div id="debtPlanDetails"></div>
+            </div>
+            
+            <button onclick="deleteAllDebts()" style="margin-top: 15px; padding: 10px; background: var(--expense); color: white; border: none; border-radius: 8px; font-size: 12px; width: 100%;">Clear All Debts</button>
+        </div>
+    </div>
+
+    <!-- Compound Interest Calculator Modal -->
+    <div class="modal" id="compoundModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">📈 Compound Interest Calculator</h2>
+                <button class="modal-close" onclick="closeModal('compoundModal')">&times;</button>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">💰 Initial Investment ($)</label>
+                <input type="number" class="form-input" id="compoundInitial" value="1000" step="0.01">
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">📅 Monthly Contribution ($)</label>
+                    <input type="number" class="form-input" id="compoundMonthly" value="100" step="0.01">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">📊 Annual Interest Rate (%)</label>
+                    <input type="number" class="form-input" id="compoundRate" value="7" step="0.1">
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">⏰ Years to Invest</label>
+                <input type="range" id="compoundYears" min="1" max="50" value="10" oninput="document.getElementById('yearsDisplay').textContent = this.value" style="width: 100%;">
+                <div style="text-align: center; font-size: 14px; color: var(--primary); font-weight: 600;"><span id="yearsDisplay">10</span> years</div>
+            </div>
+            
+            <button class="btn btn-primary" onclick="calculateCompound()">Calculate</button>
+            
+            <div id="compoundResults" style="margin-top: 20px; padding: 15px; background: linear-gradient(135deg, #10b981, #059669); border-radius: 10px; color: white; display: none;">
+                <div style="text-align: center;">
+                    <div style="font-size: 12px; opacity: 0.9;">Future Value</div>
+                    <div style="font-size: 28px; font-weight: 700;" id="compoundFutureValue">$0</div>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.3);">
+                    <div style="text-align: center;">
+                        <div style="font-size: 11px; opacity: 0.8;">Your Contributions</div>
+                        <div style="font-weight: 600;" id="compoundContributions">$0</div>
+                    </div>
+                    <div style="text-align: center;">
+                        <div style="font-size: 11px; opacity: 0.8;">Interest Earned</div>
+                        <div style="font-weight: 600;" id="compoundInterest">$0</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div style="margin-top: 15px; padding: 12px; background: #dbeafe; border-radius: 8px; font-size: 12px; color: #1e40af;">
+                💡 <strong>Tip:</strong> At 7% annual return (stock market average), your money doubles every ~10 years!
+            </div>
+        </div>
+    </div>
+
+    <!-- Savings Tips Modal -->
+    <div class="modal" id="tipsModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">💡 Smart Savings Tips</h2>
+                <button class="modal-close" onclick="closeModal('tipsModal')">&times;</button>
+            </div>
+            
+            <div id="savingsTips" style="max-height: 400px; overflow-y: auto;">
+                <!-- Tips will be generated by JavaScript -->
+            </div>
+            
+            <button class="btn btn-primary" style="margin-top: 15px; background: #f59e0b;" onclick="showRandomTip()">🎲 Show Another Tip</button>
         </div>
     </div>
 
@@ -986,6 +1233,426 @@
                 if (e.target === modal) closeModal(modal.id);
             });
         });
+
+        // ===== Financial Literacy Features =====
+
+        // 50/30/20 Rule Calculation
+        function calculate503020() {
+            const transactions = JSON.parse(localStorage.getItem('budget-transactions') || '[]');
+            const currentMonth = new Date().toISOString().slice(0, 7);
+            const monthTrans = transactions.filter(t => t.date.startsWith(currentMonth) && t.type === 'expense');
+            
+            const totalIncome = transactions
+                .filter(t => t.date.startsWith(currentMonth) && t.type === 'income')
+                .reduce((sum, t) => sum + t.amount, 0);
+            
+            const totalExpense = monthTrans.reduce((sum, t) => sum + t.amount, 0);
+            
+            // Define needs vs wants categories
+            const needsCategories = ['Rent', 'Housing', 'Utilities', 'Food', 'Groceries', 'Transportation', 'Healthcare', 'Insurance', 'Phone'];
+            const wantsCategories = ['Entertainment', 'Shopping', 'Dining', 'Subscriptions', 'Hobbies', 'Travel'];
+            
+            let needsTotal = 0, wantsTotal = 0;
+            
+            monthTrans.forEach(t => {
+                if (needsCategories.some(c => t.category.toLowerCase().includes(c.toLowerCase()))) {
+                    needsTotal += t.amount;
+                } else if (wantsCategories.some(c => t.category.toLowerCase().includes(c.toLowerCase()))) {
+                    wantsTotal += t.amount;
+                } else {
+                    // Default: 60% needs, 40% wants for uncategorized
+                    needsTotal += t.amount * 0.6;
+                    wantsTotal += t.amount * 0.4;
+                }
+            });
+            
+            const savingsTotal = totalIncome - totalExpense;
+            const total = Math.max(totalIncome, totalExpense);
+            
+            if (total > 0) {
+                const needsPct = Math.min((needsTotal / total) * 100, 50);
+                const wantsPct = Math.min((wantsTotal / total) * 100, 30);
+                const savingsPct = Math.min(Math.max(100 - needsPct - wantsPct, 0), 20);
+                
+                document.getElementById('needsBar').style.width = needsPct + '%';
+                document.getElementById('wantsBar').style.width = wantsPct + '%';
+                document.getElementById('savingsBar').style.width = savingsPct + '%';
+                
+                // Show status message
+                const statusDiv = document.getElementById('ruleStatus');
+                statusDiv.style.display = 'block';
+                
+                const idealNeeds = totalIncome * 0.5;
+                const idealWants = totalIncome * 0.3;
+                const idealSavings = totalIncome * 0.2;
+                
+                let status = '';
+                if (needsTotal > idealNeeds) {
+                    status = '⚠️ You\'re overspending on Needs. Try to reduce expenses like Housing or Utilities.';
+                    statusDiv.style.background = '#fee2e2';
+                    statusDiv.style.color = '#991b1b';
+                } else if (wantsTotal > idealWants) {
+                    status = '⚠️ High Wants spending. Consider cutting Entertainment or Shopping.';
+                    statusDiv.style.background = '#fef3c7';
+                    statusDiv.style.color = '#92400e';
+                } else if (savingsTotal < idealSavings) {
+                    status = '💡 Tip: Try to save at least 20% of income. Pay Yourself First!';
+                    statusDiv.style.background = '#d1fae5';
+                    statusDiv.style.color = '#065f46';
+                } else {
+                    status = '🎉 Great job! You\'re following the 50/30/20 rule!';
+                    statusDiv.style.background = '#d1fae5';
+                    statusDiv.style.color = '#065f46';
+                }
+                statusDiv.textContent = status;
+            }
+        }
+
+        // Emergency Fund Functions
+        let emergencyFund = JSON.parse(localStorage.getItem('budget-emergency') || '{"balance": 0, "goal": 3000}');
+
+        function renderEmergencyFund() {
+            document.getElementById('emergencyBalance').textContent = '$' + emergencyFund.balance.toFixed(2);
+            document.getElementById('emergencyGoal').textContent = '$' + emergencyFund.goal.toFixed(2);
+            
+            const pct = Math.min((emergencyFund.balance / emergencyFund.goal) * 100, 100);
+            const progressBar = document.getElementById('emergencyProgress');
+            progressBar.style.width = pct + '%';
+            
+            if (pct >= 100) {
+                progressBar.className = 'progress-fill ok';
+            } else if (pct >= 50) {
+                progressBar.className = 'progress-fill warning';
+            } else {
+                progressBar.className = 'progress-fill danger';
+            }
+        }
+
+        function saveEmergencyGoal(e) {
+            e.preventDefault();
+            const monthly = parseFloat(document.getElementById('monthlyExpenses').value) || 0;
+            const add = parseFloat(document.getElementById('addToEmergency').value) || 0;
+            
+            if (monthly > 0) {
+                emergencyFund.goal = monthly * 3; // 3 months minimum
+            }
+            emergencyFund.balance += add;
+            
+            localStorage.setItem('budget-emergency', JSON.stringify(emergencyFund));
+            renderEmergencyFund();
+            closeModal('emergencyModal');
+        }
+
+        // Savings Goals Functions
+        let goals = JSON.parse(localStorage.getItem('budget-goals') || '[]');
+
+        function renderGoals() {
+            const container = document.getElementById('goalsList');
+            const modalContainer = document.getElementById('goalsListModal');
+            
+            if (goals.length === 0) {
+                container.innerHTML = '<p style="color: var(--text-light); font-size: 12px;">No goals yet</p>';
+                modalContainer.innerHTML = '<p style="color: var(--text-light);">No goals yet</p>';
+                return;
+            }
+            
+            let html = '';
+            let modalHtml = '';
+            
+            goals.forEach((goal, i) => {
+                const progress = Math.min((goal.saved / goal.target) * 100, 100);
+                const remaining = Math.max(goal.target - goal.saved, 0);
+                const daysLeft = Math.ceil((new Date(goal.date) - new Date()) / (1000 * 60 * 60 * 24));
+                
+                const goalHtml = `
+                    <div style="margin-bottom: 10px; padding: 8px; background: var(--bg); border-radius: 8px;">
+                        <div style="font-size: 12px; font-weight: 600;">${goal.name}</div>
+                        <div style="font-size: 11px; color: var(--text-light);">$${goal.saved} / $${goal.target}</div>
+                        <div class="progress" style="height: 4px; margin-top: 4px;">
+                            <div class="progress-fill ok" style="width: ${progress}%;"></div>
+                        </div>
+                        <div style="font-size: 10px; color: var(--text-light); margin-top: 4px;">
+                            ${remaining > 0 ? 'Need $' + remaining.toFixed(0) + ' more' : '✅ Goal reached!'} 
+                            • ${daysLeft > 0 ? daysLeft + ' days left' : 'Overdue'}
+                        </div>
+                    </div>
+                `;
+                
+                html += goalHtml;
+                modalHtml += goalHtml;
+                
+                // Add donation option to goals
+                if (remaining > 0) {
+                    modalHtml += `<button onclick="donateToGoal(${i})" style="padding: 4px 8px; background: var(--primary); color: white; border: none; border-radius: 4px; font-size: 11px; margin-top: 4px;">+ Donate</button>`;
+                }
+            });
+            
+            container.innerHTML = html;
+            modalContainer.innerHTML = modalHtml;
+        }
+
+        function saveGoal(e) {
+            e.preventDefault();
+            const goal = {
+                name: document.getElementById('goalName').value,
+                target: parseFloat(document.getElementById('goalAmount').value),
+                date: document.getElementById('goalDate').value,
+                saved: 0
+            };
+            goals.push(goal);
+            localStorage.setItem('budget-goals', JSON.stringify(goals));
+            renderGoals();
+            document.getElementById('goalName').value = '';
+            document.getElementById('goalAmount').value = '';
+        }
+
+        function donateToGoal(index) {
+            const amount = prompt('How much to add to this goal?');
+            if (amount && parseFloat(amount) > 0) {
+                goals[index].saved += parseFloat(amount);
+                localStorage.setItem('budget-goals', JSON.stringify(goals));
+                renderGoals();
+            }
+        }
+
+        // Initialize new features
+        if (localStorage.getItem('budget-loggedIn')) {
+            setTimeout(() => {
+                calculate503020();
+                renderEmergencyFund();
+                renderGoals();
+                renderDebtList();
+                renderSavingsTips();
+            }, 500);
+        }
+
+        // ===== DEBT TRACKER FUNCTIONS =====
+        let debts = JSON.parse(localStorage.getItem('budget-debts') || '[]');
+
+        function addDebt(e) {
+            e.preventDefault();
+            const debt = {
+                id: 'd' + Date.now(),
+                name: document.getElementById('debtName').value,
+                balance: parseFloat(document.getElementById('debtBalance').value),
+                rate: parseFloat(document.getElementById('debtRate').value),
+                minPayment: parseFloat(document.getElementById('debtMinPayment').value)
+            };
+            debts.push(debt);
+            localStorage.setItem('budget-debts', JSON.stringify(debts));
+            renderDebtList();
+            document.getElementById('debtName').value = '';
+            document.getElementById('debtBalance').value = '';
+            document.getElementById('debtRate').value = '';
+            document.getElementById('debtMinPayment').value = '';
+        }
+
+        function renderDebtList() {
+            const container = document.getElementById('debtList');
+            const totalDebtEl = document.getElementById('totalDebt');
+            const strategy = document.getElementById('debtStrategy').value;
+            
+            if (debts.length === 0) {
+                container.innerHTML = '<p style="color: var(--text-light); text-align: center;">No debts added yet</p>';
+                totalDebtEl.textContent = '$0';
+                document.getElementById('debtPayoffPlan').style.display = 'none';
+                return;
+            }
+            
+            // Sort by strategy
+            let sortedDebts = [...debts];
+            if (strategy === 'snowball') {
+                sortedDebts.sort((a, b) => a.balance - b.balance);
+            } else {
+                sortedDebts.sort((a, b) => b.rate - a.rate);
+            }
+            
+            // Calculate total
+            const total = debts.reduce((sum, d) => sum + d.balance, 0);
+            totalDebtEl.textContent = '$' + total.toFixed(2);
+            
+            // Render list
+            container.innerHTML = sortedDebts.map((debt, index) => {
+                const monthlyRate = debt.rate / 100 / 12;
+                const monthlyInterest = debt.balance * monthlyRate;
+                return `
+                    <div style="padding: 12px; background: var(--bg); border-radius: 8px; margin-bottom: 8px; position: relative;">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <div style="font-weight: 600;">${debt.name}</div>
+                                <div style="font-size: 12px; color: var(--text-light);">
+                                    $${debt.balance.toFixed(2)} @ ${debt.rate}% APR • $${debt.minPayment}/mo min
+                                </div>
+                            </div>
+                            <div style="text-align: right;">
+                                <div style="color: var(--expense); font-weight: 700;">$${monthlyInterest.toFixed(2)}/mo interest</div>
+                                ${index === 0 ? '<div style="font-size: 10px; color: var(--primary); font-weight: 600;">🎯 PAY THIS FIRST</div>' : ''}
+                            </div>
+                        </div>
+                        <button onclick="removeDebt('${debt.id}')" style="position: absolute; top: 5px; right: 5px; background: var(--expense); color: white; border: none; border-radius: 4px; padding: 2px 6px; font-size: 10px; cursor: pointer;">✕</button>
+                    </div>
+                `;
+            }).join('');
+            
+            // Show payoff plan
+            showDebtPayoffPlan(sortedDebts);
+        }
+
+        function showDebtPayoffPlan(sortedDebts) {
+            const planDiv = document.getElementById('debtPayoffPlan');
+            const detailsDiv = document.getElementById('debtPlanDetails');
+            
+            if (sortedDebts.length === 0) {
+                planDiv.style.display = 'none';
+                return;
+            }
+            
+            planDiv.style.display = 'block';
+            
+            let totalBalance = sortedDebts.reduce((sum, d) => sum + d.balance, 0);
+            let totalMinPayments = sortedDebts.reduce((sum, d) => sum + d.minPayment, 0);
+            let months = 0;
+            let totalInterest = 0;
+            
+            // Calculate pay off time with extra payment
+            let extraPayment = 100; // Extra $100/month
+            let balances = sortedDebts.map(d => ({...d, currentBalance: d.balance}));
+            
+            while (balances.some(b => b.currentBalance > 0) && months < 360) {
+                months++;
+                balances.forEach(b => {
+                    if (b.currentBalance > 0) {
+                        const interest = b.currentBalance * (b.rate / 100 / 12);
+                        totalInterest += interest;
+                        b.currentBalance += interest;
+                        
+                        let payment = b.minPayment;
+                        if (b === balances.find(x => x.currentBalance > 0)) {
+                            payment += extraPayment;
+                        }
+                        
+                        b.currentBalance = Math.max(0, b.currentBalance - payment);
+                    }
+                });
+            }
+            
+            const years = Math.floor(months / 12);
+            const remainingMonths = months % 12;
+            
+            detailsDiv.innerHTML = `
+                <div style="font-size: 12px;">
+                    <p><strong>Strategy:</strong> ${document.getElementById('debtStrategy').value === 'snowball' ? 'Snowball (smallest first)' : 'Avalanche (highest interest first)'}</p>
+                    <p><strong>Payoff time:</strong> ${years > 0 ? years + ' years ' : ''}${remainingMonths} months</p>
+                    <p><strong>Total interest:</strong> <span style="color: var(--expense);">$${totalInterest.toFixed(2)}</span></p>
+                    <p style="margin-top: 8px; padding: 8px; background: #d1fae5; border-radius: 6px; color: #065f46;">
+                        💡 <strong>Tip:</strong> Pay $${extraPayment}/mo extra on the first debt to save money and get debt-free faster!
+                    </p>
+                </div>
+            `;
+        }
+
+        function removeDebt(id) {
+            debts = debts.filter(d => d.id !== id);
+            localStorage.setItem('budget-debts', JSON.stringify(debts));
+            renderDebtList();
+        }
+
+        function deleteAllDebts() {
+            if (confirm('Delete all debts?')) {
+                debts = [];
+                localStorage.setItem('budget-debts', JSON.stringify(debts));
+                renderDebtList();
+            }
+        }
+
+        // ===== COMPOUND INTEREST CALCULATOR =====
+        function calculateCompound() {
+            const initial = parseFloat(document.getElementById('compoundInitial').value) || 0;
+            const monthly = parseFloat(document.getElementById('compoundMonthly').value) || 0;
+            const rate = parseFloat(document.getElementById('compoundRate').value) / 100 || 0;
+            const years = parseInt(document.getElementById('compoundYears').value) || 10;
+            
+            // A = P(1 + r/n)^(nt) + PMT * (((1 + r/n)^(nt) - 1) / (r/n))
+            const n = 12; // Monthly compounding
+            const t = years;
+            
+            const futureValueInitial = initial * Math.pow(1 + rate / n, n * t);
+            const futureValueMonthly = monthly * ((Math.pow(1 + rate / n, n * t) - 1) / (rate / n));
+            
+            const total = futureValueInitial + futureValueMonthly;
+            const contributions = initial + (monthly * 12 * years);
+            const interest = total - contributions;
+            
+            document.getElementById('compoundFutureValue').textContent = '$' + total.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+            document.getElementById('compoundContributions').textContent = '$' + contributions.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+            document.getElementById('compoundInterest').textContent = '$' + interest.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+            document.getElementById('compoundResults').style.display = 'block';
+        }
+
+        // ===== SAVINGS TIPS =====
+        const savingsTipsList = [
+            "🥗 Cook at home more often - saving up to $200/month vs eating out",
+            "📱 Cancel unused subscriptions - audit your streaming services monthly",
+            "🛒 Make a shopping list before going to the store - avoid impulse buys",
+            "💡 Use LED bulbs - they use 75% less energy than incandescent",
+            "🚗 carpool or use public transit - save on gas and parking",
+            "💳 Pay with cash or debit - avoid credit card overspending",
+            "🎯 Set up automatic savings - 'Pay Yourself First'",
+            "🏷️ Use coupons and cashback apps like Rakuten",
+            "📦 Buy generic brands - same quality, lower price",
+            "⚡ Unplug electronics when not in use - kill phantom energy usage",
+            "🎉 Celebrate milestones with free activities instead of spending",
+            "🍎 Meal prep on Sundays - saves time and money during the week",
+            "💰 The 24-hour rule: wait a day before non-essential purchases",
+            "📊 Review your budget weekly - awareness leads to savings",
+            "🏠 Negotiate bills: Call providers to ask for better rates",
+            "🎁 Give experiences instead of things - often cheaper and more meaningful",
+            "📚 Use the library for books, movies, and even digital resources",
+            "💵 Keep spare change in a jar - adds up to hundreds per year",
+            "🛒 Compare prices online before buying anything big",
+            "👕 Buy quality basics that last longer instead of cheap fast fashion"
+        ];
+
+        let currentTipIndex = 0;
+
+        function renderSavingsTips() {
+            const container = document.getElementById('savingsTips');
+            container.innerHTML = savingsTipsList.map((tip, index) => `
+                <div style="padding: 15px; background: ${index === 0 ? 'linear-gradient(135deg, #fef3c7, #fde68a)' : 'var(--bg)'}; border-radius: 10px; margin-bottom: 10px; border-left: 4px solid ${index < 3 ? '#f59e0b' : '#e2e8f0'};">
+                    <div style="font-size: 14px;">${tip}</div>
+                    ${index < 3 ? '<div style="font-size: 10px; color: #92400e; margin-top: 5px;">⭐ Popular Tip</div>' : ''}
+                </div>
+            `).join('');
+        }
+
+        function showRandomTip() {
+            const container = document.getElementById('savingsTips');
+            const randomTip = savingsTipsList[Math.floor(Math.random() * savingsTipsList.length)];
+            container.innerHTML = `
+                <div style="padding: 20px; background: linear-gradient(135deg, #dbeafe, #bfdbfe); border-radius: 12px; border-left: 4px solid #3b82f6;">
+                    <div style="font-size: 16px; text-align: center;">${randomTip}</div>
+                </div>
+                <button class="btn btn-primary" style="margin-top: 15px;" onclick="renderSavingsTips()">👀 Show All Tips</button>
+            `;
+        }
+
+        // ===== SMART GOALS ENHANCEMENT =====
+        function enhanceGoalsWithSMART() {
+            // Goals already have target amount and date, which are SMART elements
+            // Let's add specific/measurable indicators
+            goals = goals.map(goal => {
+                if (!goal.specific) {
+                    goal.specific = goal.name.length > 0;
+                }
+                if (!goal.milestones) {
+                    goal.milestones = [];
+                }
+                return goal;
+            });
+            localStorage.setItem('budget-goals', JSON.stringify(goals));
+        }
+
+        enhanceGoalsWithSMART();
     </script>
 </body>
 </html>>l>>html>>
