@@ -181,6 +181,10 @@
         .section-header h3 { font-size: 16px; color: var(--text); }
         .section-header button { padding: 8px 16px; background: var(--primary); color: white; border: none; border-radius: 8px; font-size: 12px; cursor: pointer; }
         
+        /* Charts section on dashboard */
+        .charts-section { margin-top: 20px; }
+        .charts-section h3 { margin: 15px 0 15px; color: var(--text); }
+        
         /* Mini stat for subscriptions */
         .mini-stat { background: linear-gradient(135deg, #8b5cf6, #6366f1); padding: 15px; border-radius: 12px; color: white; cursor: pointer; }
         .mini-stat .label { font-size: 11px; opacity: 0.9; }
@@ -194,6 +198,35 @@
             .nav { display: none; }
             .fab { bottom: 110px; }
         }
+        
+        /* Customizable Navigation */
+        .nav-edit-btn { background: rgba(255,255,255,0.2); border: none; color: white; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 12px; margin-left: 10px; }
+        
+        .nav-edit-modal { display: none; position: fixed; inset: 0; background: rgb(0 0 0 / 0.5); z-index: 200; align-items: center; justify-content: center; padding: 20px; }
+        .nav-edit-modal.active { display: flex; }
+        
+        .nav-edit-content { background: var(--card); border-radius: 20px; padding: 24px; width: 100%; max-width: 350px; }
+        .nav-edit-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .nav-edit-title { font-size: 18px; font-weight: 700; }
+        
+        .nav-edit-list { display: flex; flex-direction: column; gap: 8px; max-height: 300px; overflow-y: auto; }
+        .nav-edit-item { display: flex; align-items: center; gap: 12px; background: var(--bg); padding: 12px; border-radius: 10px; cursor: grab; transition: all 0.2s; }
+        .nav-edit-item:active { cursor: grabbing; }
+        .nav-edit-item.dragging { opacity: 0.5; background: var(--primary); color: white; }
+        .nav-edit-item.drag-over { border: 2px dashed var(--primary); transform: scale(1.02); }
+        .nav-edit-handle { color: var(--text-light); font-size: 16px; cursor: grab; }
+        .nav-edit-icon { font-size: 18px; }
+        .nav-edit-label { flex: 1; font-size: 14px; font-weight: 500; }
+        
+        .nav-edit-actions { display: flex; gap: 10px; margin-top: 20px; }
+        .nav-edit-btn-save { flex: 1; padding: 12px; background: var(--primary); color: white; border: none; border-radius: 10px; font-weight: 600; cursor: pointer; }
+        .nav-edit-btn-cancel { flex: 1; padding: 12px; background: #e2e8f0; color: var(--text); border: none; border-radius: 10px; font-weight: 600; cursor: pointer; }
+        
+        .nav-move-btns { display: flex; flex-direction: column; gap: 2px; }
+        .nav-move-btn { background: none; border: none; cursor: pointer; padding: 2px; font-size: 10px; color: var(--text-light); }
+        .nav-move-btn:hover { color: var(--primary); }
+        
+        .nav-toggle-edit { position: absolute; right: 10px; top: 5px; opacity: 0.6; }
     </style>
 </head>
 <body>
@@ -257,17 +290,20 @@
             <button class="tab" data-filter="expense">Expense</button>
         </div>
 
-        <!-- SIMPLIFIED Dashboard: Solo transacciones recientes + un chart pequeño -->
+        <!-- Dashboard: Transactions + Visible Charts -->
         <div class="dashboard-content" style="padding: 0 20px 120px;">
-            <h3 style="margin: 10px 0 10px; color: var(--text);">Recent Transactions</h3>
+            <div class="section-header">
+                <h3>Recent Transactions</h3>
+            </div>
             <div id="transactionsList"></div>
             <div class="empty" id="emptyTransactions" style="display: none;">
                 <div class="empty-icon">📝</div>
                 <p>No transactions yet</p>
             </div>
             
-            <!-- Charts hidden by default for cleaner look - can be shown from More menu -->
-            <div id="chartsSection" style="display: none;">
+            <!-- Charts VISIBLE on Dashboard -->
+            <div class="charts-section" style="margin-top: 25px;">
+                <h3 style="margin: 15px 0 15px; color: var(--text);">📊 Financial Overview</h3>
                 <div class="chart-container">
                     <h3>Expense by Category</h3>
                     <canvas id="pieChart"></canvas>
@@ -385,8 +421,11 @@
 
         <button class="fab" onclick="openModal('transactionModal')">+</button>
         
+        <!-- Nav Edit Button -->
+        <button class="nav-edit-btn" style="position: fixed; bottom: 85px; right: 20px; z-index: 60; background: var(--primary); color: white; border: none; padding: 8px 14px; border-radius: 20px; font-size: 14px; cursor: pointer; box-shadow: 0 2px 10px rgba(99,102,241,0.4);" onclick="openNavEdit()">⚙️ Customize</button>
+        
         <!-- Bottom Navigation -->
-        <div class="nav" style="z-index: 50;">
+        <div class="nav" style="z-index: 50;" id="mainNav">
             <div class="nav-item active" data-view="dashboard" onclick="switchView('dashboard')">
                 <span class="nav-icon">📊</span>
                 Dashboard
@@ -406,6 +445,22 @@
             <div class="nav-item" data-view="more" onclick="openModal('moreModal')">
                 <span class="nav-icon">☰</span>
                 More
+            </div>
+        </div>
+        
+        <!-- Nav Reorder Modal -->
+        <div class="nav-edit-modal" id="navEditModal">
+            <div class="nav-edit-content">
+                <div class="nav-edit-header">
+                    <h2 class="nav-edit-title">⚙️ Customize Menu</h2>
+                    <button class="modal-close" onclick="closeNavEdit()">&times;</button>
+                </div>
+                <p style="font-size: 13px; color: var(--text-light); margin-bottom: 15px;">Drag items to reorder or use arrows</p>
+                <div class="nav-edit-list" id="navEditList"></div>
+                <div class="nav-edit-actions">
+                    <button class="nav-edit-btn-cancel" onclick="closeNavEdit()">Cancel</button>
+                    <button class="nav-edit-btn-save" onclick="saveNavOrder()">Save</button>
+                </div>
             </div>
         </div>
     </div>
@@ -889,6 +944,18 @@
     </div>
 
     <script>
+        // Default Navigation Items
+        const defaultNavItems = [
+            { id: 'dashboard', icon: '📊', label: 'Dashboard' },
+            { id: 'subscriptions', icon: '📺', label: 'Subs' },
+            { id: 'networth', icon: '💎', label: 'Net Worth' },
+            { id: 'bills', icon: '📄', label: 'Bills' },
+            { id: 'more', icon: '☰', label: 'More' }
+        ];
+        
+        // Current nav items (loaded from localStorage or default)
+        let navItems = JSON.parse(localStorage.getItem('budget_nav_order')) || [...defaultNavItems];
+        
         // State
         let user = null;
         let transactions = [];
@@ -1015,6 +1082,114 @@
             document.getElementById('authScreen').style.display = 'none';
             document.getElementById('app').style.display = 'block';
             document.getElementById('userAvatar').textContent = user.avatar;
+            renderNavigation();
+        }
+
+        // Navigation Functions
+        function renderNavigation() {
+            const nav = document.getElementById('mainNav');
+            nav.innerHTML = navItems.map(item => `
+                <div class="nav-item ${item.id === 'dashboard' ? 'active' : ''}" data-view="${item.id}" onclick="handleNavClick('${item.id}')">
+                    <span class="nav-icon">${item.icon}</span>
+                    ${item.label}
+                </div>
+            `).join('');
+        }
+
+        function handleNavClick(view) {
+            if (view === 'more') {
+                openModal('moreModal');
+            } else {
+                switchView(view);
+            }
+        }
+
+        // Nav Reorder Functions
+        function openNavEdit() {
+            renderNavEditList();
+            document.getElementById('navEditModal').classList.add('active');
+        }
+
+        function closeNavEdit() {
+            document.getElementById('navEditModal').classList.remove('active');
+        }
+
+        function renderNavEditList() {
+            const container = document.getElementById('navEditList');
+            container.innerHTML = navItems.map((item, index) => `
+                <div class="nav-edit-item" draggable="true" data-index="${index}">
+                    <span class="nav-edit-handle">☰</span>
+                    <span class="nav-edit-icon">${item.icon}</span>
+                    <span class="nav-edit-label">${item.label}</span>
+                    <div class="nav-move-btns">
+                        <button class="nav-move-btn" onclick="moveNavItem(${index}, -1)" ${index === 0 ? 'disabled' : ''}>▲</button>
+                        <button class="nav-move-btn" onclick="moveNavItem(${index}, 1)" ${index === navItems.length - 1 ? 'disabled' : ''}>▼</button>
+                    </div>
+                </div>
+            `).join('');
+            
+            // Add drag and drop listeners
+            setupDragAndDrop();
+        }
+
+        function moveNavItem(index, direction) {
+            const newIndex = index + direction;
+            if (newIndex < 0 || newIndex >= navItems.length) return;
+            
+            const item = navItems.splice(index, 1)[0];
+            navItems.splice(newIndex, 0, item);
+            renderNavEditList();
+        }
+
+        function setupDragAndDrop() {
+            const items = document.querySelectorAll('.nav-edit-item');
+            let draggedItem = null;
+            
+            items.forEach(item => {
+                item.addEventListener('dragstart', (e) => {
+                    draggedItem = item;
+                    item.classList.add('dragging');
+                    e.dataTransfer.effectAllowed = 'move';
+                });
+                
+                item.addEventListener('dragend', () => {
+                    item.classList.remove('dragging');
+                    items.forEach(i => i.classList.remove('drag-over'));
+                    draggedItem = null;
+                });
+                
+                item.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    if (draggedItem && draggedItem !== item) {
+                        item.classList.add('drag-over');
+                    }
+                });
+                
+                item.addEventListener('dragleave', () => {
+                    item.classList.remove('drag-over');
+                });
+                
+                item.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    item.classList.remove('drag-over');
+                    
+                    if (draggedItem && draggedItem !== item) {
+                        const fromIndex = parseInt(draggedItem.dataset.index);
+                        const toIndex = parseInt(item.dataset.index);
+                        
+                        const movedItem = navItems.splice(fromIndex, 1)[0];
+                        navItems.splice(toIndex, 0, movedItem);
+                        
+                        renderNavEditList();
+                    }
+                });
+            });
+        }
+
+        function saveNavOrder() {
+            localStorage.setItem('budget_nav_order', JSON.stringify(navItems));
+            renderNavigation();
+            closeNavEdit();
         }
 
         // Data Functions
